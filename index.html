@@ -1,0 +1,107 @@
+<head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://trello.com/1/client.js?key=ae3ab7813e41fff4df3f0760bb7bda88"></script>
+</head>
+
+<body>
+  <h1>Init 1</h1>
+  <div id="58acf27f162d42f6b99de927">
+  </div>
+  <div id="58acf28946d9c88001413d64">
+  </div>
+  <div id="58acf32376ea63d4bf7a4d99">
+  </div>
+  <div id="58acf329d557b40732662297">
+  </div>
+  <div id="58acf3e1dcba5c29a877d418">
+  </div>
+  <div id="58acf3e8f74a7c29deda0f3b">
+  </div>
+
+</body>
+
+<script>
+var authenticationSuccess = function()
+{
+  board="58ace8d2fb959436803a475a";
+  Trello.get("/boards/"+board+"/lists",
+  function(data)
+  {
+    for(i=1;i<data.length;i++)
+    {
+      setTable(data[i].id, data[i].name);
+    }
+  },
+  function()
+  {
+    console.log("errorcito");
+  });
+};
+  var authenticationFailure = function() {
+    console.log("fail");
+  };
+  Trello.authorize({
+    type: 'popup',
+    name: 'Getting Started Application',
+    scope: {
+      read: 'true',
+      write: 'true' },
+    expiration: 'never',
+    success: authenticationSuccess,
+    error: authenticationFailure
+  });
+
+function setTable(idList, name)
+{
+
+Trello.get("/lists/"+idList+"/cards",
+    function(data)
+    {
+      var names = []
+      var nums = []
+      var nums_sum = 0.0
+      for(i=0;i<data.length;i++)
+      {
+        names.push(data[i].name)
+        j=data[i].name.length-1
+        while(data[i].name[j]!=' ')
+        {
+          j--
+        }
+        j++
+        var str_num=""
+        for(;j<data[i].name.length;j++)
+        {
+          if(data[i].name[j]!="," && data[i].name[j]!="L")
+            str_num+=data[i].name[j]
+        }
+        if(parseFloat(str_num))
+          nums.push(parseFloat(str_num))
+        else
+          nums.push(0)
+      }
+      var str_grades_append=""
+      for(i=0;i<names.length;i++)
+      {
+        str_grades_append+="<tr>"
+        str_grades_append+="<td>"+names[i]+"</td>"
+        str_grades_append+="<td>"+nums[i]+"</td>"
+        str_grades_append+="</tr>"
+        nums_sum+=nums[i]
+      }
+      str_grades_append+="<tr><td><b>Total:</b></td><td><b>"+nums_sum+"</b></td></tr>"
+      $("#"+idList).append("<h2>"+name+"</h2>");
+      $("#"+idList).append("<table>"+str_grades_append+"</table>");
+      $("#"+idList).append("<progress value='"+(nums_sum)+"' max='1000000'>");
+    },
+    function()
+    {
+      console.log("errorcito");
+    }
+  );
+}
+</script>
